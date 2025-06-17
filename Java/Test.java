@@ -1,4 +1,4 @@
-import bagel.Vector2;
+import bagel.Vector;
 
 public class Test 
 {
@@ -7,7 +7,7 @@ public class Test
         System.out.println("Hello, BAGEL!");
 
         System.out.println("testing Vector class");
-        Vector2 v = new Vector2(3, 4);
+        Vector v = new Vector(3, 4);
         System.out.println( v );
         System.out.println( v.getLength() );
         v.multiply(2);

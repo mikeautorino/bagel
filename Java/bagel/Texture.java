@@ -1,7 +1,11 @@
 package bagel;
 
 import java.io.File;
-import javafx.scene.image.Image;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import java.awt.image.BufferedImage;
 
 /**
  * Image data used when drawing a {@link Sprite} 
@@ -15,7 +19,7 @@ public class Texture
 	/**
 	 *  The image to be drawn.
 	 */
-	public Image image;
+	public BufferedImage image;
 	
 	/**
 	 *  A rectangular sub-area of the image to be drawn.
@@ -37,11 +41,28 @@ public class Texture
 	 */
 	public static Texture load(String imageFileName)
     {
-        Texture tex = new Texture();
-        String fileName = new File(imageFileName).toURI().toString();
-        tex.image   = new Image( fileName );
-        tex.region  = new Rectangle();
-        tex.region.setValues( 0, 0, tex.image.getWidth(), tex.image.getHeight() );
-        return tex;
+		Texture tex = new Texture();
+        // String fileName = new File(imageFileName).toURI().toString();
+		
+		try 
+		{
+            tex.image = ImageIO.read(new File(imageFileName));
+			tex.region  = new Rectangle();
+        	tex.region.setValues( 0, 0, tex.image.getWidth(), tex.image.getHeight() );
+        } 
+		catch (IOException e) 
+		{
+			System.err.println("error reading file");
+            e.printStackTrace();
+        }
+
+		return tex;
+
+		/*
+        
+        
+        
+        
+		*/
     }
 }

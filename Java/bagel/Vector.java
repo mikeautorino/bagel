@@ -1,4 +1,4 @@
-package net.stemkoski.bagel;
+package bagel;
 
 
 /**
@@ -7,7 +7,7 @@ package net.stemkoski.bagel;
  * and minimum translation vectors for collision resolution 
  * (see {@link Rectangle}, {@link TileMap}).
  */
-public class Vector2 implements Comparable<Vector2>
+public class Vector implements Comparable<Vector>
 {
     /**
      *  x-coordinate of the vector
@@ -22,7 +22,7 @@ public class Vector2 implements Comparable<Vector2>
     /**
      * Initializes vector coordinates to (0,0).
      */
-    public Vector2()
+    public Vector()
     {
         this.setValues(0,0);
     }
@@ -32,7 +32,7 @@ public class Vector2 implements Comparable<Vector2>
      * @param x x-coordinate
      * @param y y-coordinate
      */
-    public Vector2(double x, double y)
+    public Vector(double x, double y)
     {
         this.setValues(x,y);
     }
@@ -53,7 +53,7 @@ public class Vector2 implements Comparable<Vector2>
      * to the coordinates of this vector.
      * @param other vector to be added to this vector
      */
-    public void addVector(Vector2 other)
+    public void addVector(Vector other)
     {
         this.x += other.x;
         this.y += other.y;
@@ -136,7 +136,7 @@ public class Vector2 implements Comparable<Vector2>
      * @param other the vector being compared against this vector
      * @return +1 if this vector is larger than other vector, -1 if other vector is larger than this vector, 0 if vectors have same length
      */
-    public int compareTo(Vector2 other)
+    public int compareTo(Vector other)
     {
         if ( this.getLength() < other.getLength() )
             return -1;
