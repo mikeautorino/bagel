@@ -1,5 +1,7 @@
 import javax.swing.*;
 import bagel.*;
+import java.util.ArrayList;
+import java.awt.*;
 
 public class Test2 
 {
@@ -22,7 +24,7 @@ public class Test2
         window.revalidate();
     }
 
-    public static void main(String[] args) 
+    public static void mainy(String[] args) 
     {
         JFrame window = new JFrame();
         window.setTitle("Hello World!");
@@ -36,7 +38,7 @@ public class Test2
         BasicSprite turtle = new BasicSprite();
         turtle.setPosition(100,50);
         turtle.setTexture(turtleTex);
-        window.add(turtle);
+        // window.add(turtle);
 
         Texture starfishTex = Texture.load("Java/assets/starfish-collector/starfish.png");
         BasicSprite starfish = new BasicSprite();
@@ -51,5 +53,59 @@ public class Test2
         window.repaint();
         window.revalidate();
     }
+
+    public static void main(String[] args) 
+    {
+        JFrame window = new JFrame();
+        window.setTitle("Hello World!");
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setSize(400, 400);
+        window.setVisible(true);
+
+        Texture turtleTex = Texture.load("Java/assets/starfish-collector/turtle.png");
+        BasicSprite turtle = new BasicSprite();
+        turtle.setPosition(100,50);
+        turtle.angle = 30;
+        turtle.setTexture(turtleTex);
+        // window.add(turtle);
+
+
+        Texture starfishTex = Texture.load("Java/assets/starfish-collector/starfish.png");
+        BasicSprite starfish = new BasicSprite();
+        starfish.setPosition(10,50);
+        starfish.setTexture(starfishTex);
+        //window.add(starfish); // not both are drawing....
+
+        ArrayList<BasicSprite> spriteList = new ArrayList<BasicSprite>();
+        spriteList.add(turtle);
+        spriteList.add(starfish);
+
+        JPanel spritecanvas = new JPanel()
+        {
+            protected void paintComponent(Graphics g) 
+            {
+                super.paintComponent(g);
+                for (BasicSprite bs : spriteList)
+                    bs.draw(g);
+            }
+        };
+
+        window.add(spritecanvas);
+        // call after adding components
+        window.revalidate();
+
+
+        Timer timer = new Timer(1000 / 60, 
+        (event) -> 
+        {
+            System.out.println("Hello");          
+            turtle.moveBy(1, 0);
+            turtle.rotateBy(1);
+            
+            window.repaint();      // Trigger a repaint
+        });
+        timer.start();
+    }
 }
+
 

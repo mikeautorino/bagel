@@ -2,29 +2,26 @@ package bagel;
 
 // import java.util.ArrayList;
 import java.awt.Graphics;
-import javax.swing.JPanel;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
-public class BasicSprite extends JPanel
+
+public class BasicSprite
 {
     // core properties
 	
 	/**
-	 * x-coordinate of center of sprite
+	 * position of top left corner? center? of sprite
 	 */
-	public double x;
-	
-	/**
-	 * y-coordinate of center of sprite
-	 */
-	public double y;
+	public Vector position;
 	
 	/**
 	 * image displayed when rendering this sprite
 	 */
-	Texture texture;
+	public Texture texture;
 	
 	/**
-	 * width of sprite
+	 * width of sprite ???
 	 */
 	public double width;
 	
@@ -41,21 +38,20 @@ public class BasicSprite extends JPanel
 	/**
 	 * shape used for collision
 	 */
-	Rectangle boundary;
+	public Rectangle boundary;
 
+	// angle of sprite rotation
+	public double angle;
+	
     /**
 	 * initialize default values of sprite properties
 	 */
 	public BasicSprite()
 	{  
-		this.x = 0;
-		this.y = 0;
-		this.visible  = true;
-
-		// collision
+		this.position = new Vector();
 		this.boundary = new Rectangle();
-
-		
+		this.visible  = true;	
+		this.angle = 0;	
 	}
 
 	// basic methods
@@ -67,8 +63,7 @@ public class BasicSprite extends JPanel
 	 */
 	public void setPosition(double x, double y)
 	{
-		this.x = x;
-		this.y = y;
+		this.position.setValues(x, y);
 	}
 
 	/**
@@ -78,8 +73,7 @@ public class BasicSprite extends JPanel
 	 */
 	public void moveBy(double deltaX, double deltaY)
 	{
-		this.x += deltaX;
-		this.y += deltaY;
+		this.position.addValues(deltaX, deltaY);
 	}   
 
 	/**
@@ -90,8 +84,42 @@ public class BasicSprite extends JPanel
 	public void setTexture(Texture tex)
 	{
 		this.texture = tex;
+		// ?? set boundary instead ??
 		this.width   = tex.region.width;
 		this.height  = tex.region.height;
+	}
+
+	// angle methods
+
+	// setAngle? use: toRadians?
+
+	/**
+	 * Rotate sprite by the specified angle.
+	 * @param deltaAngle the angle (in degrees) to rotate this sprite
+	 */
+	public void rotateBy(double deltaAngle)
+	{
+		this.angle += deltaAngle;
+	}
+
+	/** 
+	 * Move sprite by the specified distance at the specified angle.
+	 * @param distance the distance to move this sprite
+	 * @param angleDegrees the angle (in degrees) along which to move this sprite
+	 */
+	public void moveAtAngle(double distance, double angleDegrees)
+	{
+		this.position.addValues( distance * Math.cos(angleDegrees * Math.PI/180),
+		                         distance * Math.sin(angleDegrees * Math.PI/180)  );
+	}
+
+	/**
+	 * Move sprite forward by the specified distance at current angle.
+	 * @param distance the distance to move this sprite
+	 */
+	public void moveForward(double distance)
+	{
+		this.moveAtAngle(distance, this.angle);
 	}
 
 	/**
@@ -105,11 +133,26 @@ public class BasicSprite extends JPanel
 		this.height = height;
 	}
 
-	protected void paintComponent(Graphics g) 
+	public void draw(Graphics g) 
 	{
-        super.paintComponent(g);
-        if (this.texture.image != null)
-            g.drawImage(this.texture.image, (int)this.x, (int)this.y, this);
+		if (!this.visible)
+			return;
+
+		// basic version
+        // g.drawImage(this.texture.image, (int)this.position.x, (int)this.position.y, null);
+
+		Graphics2D g2 = (Graphics2D) g.create();
+
+		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        // g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+        double cx = this.position.x + this.texture.image.getWidth() / 2;
+        double cy = this.position.y + this.texture.image.getHeight() / 2;
+
+        g2.rotate(Math.toRadians(angle), cx, cy);
+        g2.drawImage(this.texture.image, (int)this.position.x, (int)this.position.y, null);
+        g2.dispose();
     }
+	
 	
 }
