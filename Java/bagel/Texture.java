@@ -8,10 +8,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 
 /**
- * Image data used when drawing a {@link Sprite} 
+ * Image data used when drawing a {@link FinalSprite} 
  * or a {@link Tile}. 
  * Texture objects are typically created using the {@link #load(String)} method.
- * Multiple instances of a {@link Sprite} may share a single Texture reference.
+ * Multiple instances of a {@link FinalSprite} may share a single Texture reference.
  *
  */
 public class Texture
@@ -23,6 +23,7 @@ public class Texture
 	
 	/**
 	 *  A rectangular sub-area of the image to be drawn.
+	 *  Used for spritesheet animation.
 	 */
 	public Rectangle region;
 

@@ -1,166 +1,140 @@
-package net.stemkoski.bagel;
+package bagel;
 
-import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
- * A structure for storing and updating the state of 
- *  hardware input devices (keyboard and mouse).
- *  Handles key down/press/up events, 
- *  mouse down/up events, and mouse position. 
+ * Handle keyboard input:
+ *  keyPressed   - happens one time when you press a key (discrete / instant)
+ *  keyPressing  - continues to happen while you are holding down the key (continuous)
+ *  keyReleased  - happens one time when you release a key (discrete / instant)
  */
 public class Input
 {
-    ArrayList<String> keyDownQueue;
-    ArrayList<String> keyUpQueue;
-    ArrayList<String> keyDownList;
-    ArrayList<String> keyPressedList;
-    ArrayList<String> keyUpList;
-
-    boolean mouseButtonDownQueue;
-    boolean mouseButtonUpQueue;
-    boolean mouseButtonDown;
-    boolean mouseButtonUp;
+    // store names of keys that have been pressed / pressing / released
+    public ArrayList<String> pressedList;
+    public ArrayList<String> pressingList;
+    public ArrayList<String> releasedList;
     
-    double mouseX;
-    double mouseY;
-    
+    // because system checks for input events asynchronously to game loop,
+    //   need to store any events when they occur,
+    //   to be processed later on during our game loop.
+    public ArrayList<String> pressQueue;
+    public ArrayList<String> releaseQueue;
+ 
     /**
-     * Initialize object and activate event listeners.
-     * @param listeningScene the window Scene that has focus during the game
+     * Input Constructor
+     *
+     * @param window the window that will register keyboard events
      */
-    Input(Scene listeningScene)
+    public Input(JFrame window)
     {
-        keyDownQueue   = new ArrayList<String>();
-        keyUpQueue     = new ArrayList<String>();
-        keyDownList    = new ArrayList<String>();
-        keyPressedList = new ArrayList<String>();
-        keyUpList      = new ArrayList<String>();
-
-        // Example Strings: UP, LEFT, Q, DIGIT1, SPACE, SHIFT
-        listeningScene.setOnKeyPressed( 
-            (KeyEvent event) -> this.keyDownQueue.add(event.getCode().toString()) 
-        );
+        pressedList = new ArrayList<String>();
+        pressingList = new ArrayList<String>();
+        releasedList = new ArrayList<String>();
         
-        listeningScene.setOnKeyReleased( 
-            (KeyEvent event) -> this.keyUpQueue.add(event.getCode().toString()) 
-        );
+        pressQueue = new ArrayList<String>();
+        releaseQueue = new ArrayList<String>();
         
-        listeningScene.setOnMousePressed(
-            (MouseEvent event) -> this.mouseButtonDownQueue = true
-        );
-        
-        listeningScene.setOnMouseReleased(
-            (MouseEvent event) -> this.mouseButtonUpQueue = true
-        );
-        
-        // this works because the canvas and window are the same size?
-        listeningScene.setOnMouseMoved(
-            (MouseEvent event) -> 
+        window.addKeyListener(
+            new KeyListener()
             {
-                this.mouseX = event.getX();
-                this.mouseY = event.getY();
-            }
-        );
+                public void keyPressed(KeyEvent e)
+                {
+                    // gets the keyboard key code (number) and converts to a string (name)
+                    String keyName = KeyEvent.getKeyText(e.getKeyCode());
+                    // add the name to queue to be processed during game loop at correct time
+                    pressQueue.add( keyName );
+
+                    // System.out.println("Pressed: " + keyName);
+                }
+
+                public void keyReleased(KeyEvent e) 
+                {
+                    // gets the keyboard key code (number) and converts to a string (name)
+                    String keyName = KeyEvent.getKeyText(e.getKeyCode());
+                    // add the name to queue to be processed during game loop at correct time
+                    releaseQueue.add( keyName );
+
+                    // System.out.println("Released: " + keyName);
+                }
+
+                public void keyTyped(KeyEvent e) { }
+        });
     }
-
+    
     /**
-     * Determine if key has been pressed / moved to down position (a discrete action).
-     * @param keyName name of corresponding key (examples: "LEFT", "A", "DIGIT1", "SPACE", "SHIFT")
-     * @return true if key was just pressed
+     * Process the data (key names) stored in queues,
+     *  so that keyPressed/keyPressing/keyReleased lists
+     *  have correct information at the correct time
+     *  (during our game loop).
      */
-    public boolean isKeyDown(String keyName)
-    {  return this.keyDownList.contains(keyName);  }
-
+    public void update()
+    {
+        // any keys which were previously pressed/released,
+        //   only true for one loop after update function called,
+        //   so now is the time to clear those lists
+        pressedList.clear();
+        releasedList.clear();
+        
+        // update the lists, based on key names stored in queues
+        for (String keyName : pressQueue)
+        {
+            // prevent duplicate key names in lists;
+            //   holding down a key can trigger multiple keyPress events
+            // continue: immediately skips to next element in loop
+            if (pressingList.contains(keyName))
+                continue;
+                
+            pressedList.add(keyName);
+            pressingList.add(keyName);
+        }
+        
+        // done with press queue; clear: remove all elements from queue
+        pressQueue.clear();
+        
+        for (String keyName : releaseQueue)
+        {
+            pressingList.remove(keyName);
+            releasedList.add(keyName);
+        }
+        
+        releaseQueue.clear();        
+    }
+    
     /**
-     * Determine if key is currently being pressed / held down (a continuous action).
-     * @param keyName name of corresponding key (examples: "LEFT", "A", "DIGIT1", "SPACE", "SHIFT")
-     * @return true if key is currently pressed
+     * Check if a key was just pressed.
+     *
+     * @param keyName the name of the key to check
+     * @return true, if the key was just pressed
      */
     public boolean isKeyPressed(String keyName)
-    {  return this.keyPressedList.contains(keyName);  }
-
-    /**
-     * Determine if key has been released / returned to up position (a discrete action).
-     * @param keyName name of corresponding key (examples: "LEFT", "A", "DIGIT1", "SPACE", "SHIFT")
-     * @return true if key was just released
-     */
-    public boolean isKeyUp(String keyName)
-    {  return this.keyUpList.contains(keyName);  }
-
-    /**
-     * Return current position of mouse on game canvas.
-     * @return current position of mouse
-     */
-    public Vector2 getMousePosition()
-    {  return new Vector2(this.mouseX, this.mouseY);  }
-    
-    /**
-     * Determine if (any) mouse button has been pressed / moved to down position.
-     * @return true if mouse button was just pressed
-     */
-    public boolean isMouseButtonDown()
-    {  return this.mouseButtonDown;  }
-    
-    /**
-     * Determine if (any) mouse button has been released / returned to up position.
-     * @return true if mouse button was just released
-     */
-    public boolean isMouseButtonUp()
-    {  return this.mouseButtonUp;  }
-    
-    /**
-     * Determine if (any) mouse button has recently been pressed
-     *   while mouse cursor position is contained with bounding area of a sprite.
-     * @param sprite Sprite to check if clicked by mouse
-     * @return true if the mouse has clicked on the sprite
-     */
-    public boolean isClicked(Sprite sprite)
-    {  return this.mouseButtonDown && sprite.getBoundary().contains( this.mouseX, this.mouseY );  }
-    
-    /**
-     *  Update state information for keyboard and mouse.
-     *  Automatically called by {@link Game} class during the game loop.
-     */
-    void update()
     {
-        // clear previous discrete event status
-        this.keyDownList.clear();
-        this.keyUpList.clear();
-        this.mouseButtonDown = false;
-        this.mouseButtonUp = false;
-        
-        // update current event status
-        for (String k : this.keyDownQueue)
-        {
-            // avoid multiple keydown events while holding key
-            // avoid duplicate entries in key pressed list
-            if ( !this.keyPressedList.contains(k) )
-            {
-                this.keyDownList.add(k);
-                this.keyPressedList.add(k);
-            }
-        }
-        
-        for (String k : this.keyUpQueue)
-        {
-            this.keyPressedList.remove(k);
-            this.keyUpList.add(k);
-        }
-        
-        if (this.mouseButtonDownQueue)
-            this.mouseButtonDown = true;
-            
-        if (this.mouseButtonUpQueue)
-            this.mouseButtonUp = true;
-            
-        // clear the queues used to store events
-        this.keyDownQueue.clear();
-        this.keyUpQueue.clear();
-        this.mouseButtonDownQueue = false;
-        this.mouseButtonUpQueue = false;
+        return pressedList.contains(keyName);
     }
+    
+    /**
+     * Check if a key is currently being held down.
+     *
+     * @param keyName the name of the key
+     * @return true, if the key is being held down
+     */
+    public boolean isKeyPressing(String keyName)
+    {
+        return pressingList.contains(keyName);
+    }
+    
+    /**
+     * Check if key was just released (just let go).
+     *
+     * @param keyName the name of the key to check
+     * @return true, if key was released
+     */
+    public boolean isKeyReleased(String keyName)
+    {
+        return releasedList.contains(keyName);
+    }
+    
 }
-

@@ -9,7 +9,7 @@ import javafx.scene.image.Image;
  * A sequence of {@link Texture}s displayed in rapid succession 
  * to create the appearance of movement.
  * Animation objects are created using the {@link #load(String, int, int, double, boolean)} method.
- * Multiple instances of a {@link Sprite} should <b>not</b> share a single Animation reference,
+ * Multiple instances of a {@link FinalSprite} should <b>not</b> share a single Animation reference,
  * as each Sprite will require its own {@link #elapsedTime} field; 
  * in this case, use the {@link #clone()} method to create a copy of the original Animation.
  */

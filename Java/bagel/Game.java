@@ -1,128 +1,235 @@
 package bagel;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;  
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
-import javafx.animation.AnimationTimer;
+import java.util.ArrayList;
+import java.awt.Graphics;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 /**
  *  Main class to be extended for game projects.
- *  Creates the window, {@link Input} and {@link Group} objects, 
+ *  Creates the window, handles {@link Input} and {@link Group} objects, 
  *    and manages the life cycle of the game (initialization and game loop). 
  */
-public class Game extends Application 
+public abstract class Game 
 {
-	/**
+    /**
 	 * default width of game canvas. may change if desired.
 	 */
-	public static int windowWidth  = 800;
+	public int windowWidth = 800;
 	
 	/**
 	 * default height of game canvas. may change if desired.
 	 */
-	public static int windowHeight = 600;
-	
-	/**
-	 * area where game graphics are displayed
-	 */
-	Canvas canvas;
-	
-	/**
-	 * object with methods to draw game entities on canvas
-	 */
-	GraphicsContext context;
+	public int windowHeight = 600;
 
-	/**
-	 * Used to store and update the state of the keyboard and mouse.
-	 */
-	public Input input;
-	
-	/**
-	 * The root collection for all {@link Entity} objects in this game.
-	 */
-	public Group group;
+    public String windowTitle = "";
 
+    // list of groups, each of which contains a list of sprites 
+    //   (to stay organized)
+    public ArrayList<Group> groupList;
+    
     /**
      * timestamp for start of previous game loop; used to calculate {@link #deltaTime}
      */
-	long previousTime;
+	public long previousTime;
 
 	/**
 	 * amount of time that has passed since the last iteration of the game loop
 	 */
 	public double deltaTime; 
 
+	/**
+	 * amount of time that has passed since game started
+	 */
+	public double elapsedTime; 
+
+    public JFrame window;
+    public JPanel canvas;
+    public Timer gameloop;
+
+    public Input input;
+
     /**
      * Initialize objects used in this game.
-     * This method should be overridden by the specific game extending this class.
+     * This method must be overridden by the specific game extending this class.
      */
-	public void create()
-    {    }
+	public abstract void initialize();
 
 	/**
 	 * Update objects used in this game.
 	 * Called 60 times per second when possible.
-	 * This method should be overridden by the specific game extending this class. 
+	 * This method must be overridden by the specific game extending this class. 
 	 * @param dt amount of time that has passed since the last iteration of the game loop
 	 */
-    // override by extending class
-	public void update(double dt)
-    {    }
-    
-	/**
-	 *  Initializes the window, Input and Group objects, 
-	 *  and manages the life cycle of the game (initialization and game loop).
-	 */
-    public void start(Stage mainStage) 
+	public abstract void update(double dt);
+
+    public void setWindowSize(int width, int height)
     {
-        // self-reference, needed for correct (game) context
-        Game self = this;
+        windowWidth = width;
+        windowHeight = height;
+    }
 
-        mainStage.setTitle("Game");
-        mainStage.setResizable(false);
+    public void setWindowTitle(String title)
+    {
+        windowTitle = title;
+    }
 
-        Pane root = new Pane();
-        Scene mainScene = new Scene(root);
-        mainStage.setScene(mainScene);
-        mainStage.sizeToScene();
+    public Game()
+    {
 
-        this.canvas = new Canvas(Game.windowWidth, Game.windowHeight);
-        this.context = this.canvas.getGraphicsContext2D();
-        root.getChildren().add(this.canvas);
+    }
 
-        this.input = new Input(mainScene);
-        this.group = new Group();
+    public void run()
+    {
+        // create the window
+        window = new JFrame();
+        window.setTitle(windowTitle);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setSize(windowWidth, windowHeight);
+        window.setVisible(true);
 
-        AnimationTimer gameloop = new AnimationTimer()
+        groupList = new ArrayList<Group>();
+
+        canvas = new JPanel()
+        {
+            protected void paintComponent(Graphics g) 
             {
-                public void handle(long currentTime)
+                super.paintComponent(g);
+
+                // draw all sprites, in all groups, in the group list.
+                for (Group group : groupList)
                 {
-                    self.deltaTime = (currentTime - self.previousTime) / 1000000000.0;
-                    self.previousTime = currentTime;
-
-                    // process input
-                    self.input.update();
-
-                    // update game state
-                    self.group.act(self.deltaTime);
-                    update(self.deltaTime);
-
-                    // render objects to screen
-                    context.setFill(Color.GRAY);
-                    context.fillRect(0,0, 800,600);
-                    self.group.draw(self.context);
+                    // update all sprites within the group
+                    // g.update( 1.0 / 60.0 );
+                    for ( Sprite s : group.getSpriteList() )
+                    {
+                        // if destroy function was called,
+                        //  remove sprite from the group that contains it.
+                        // if (s.destroySignal == true)
+                        //     g.removeSprite(s);
+                            
+                        s.draw(g);
+                    }
                 }
+            }
+        };
 
-            };
+        input = new Input(window);
 
-        mainStage.show();
+        window.add(canvas);
+        // must call after adding components
+        window.revalidate();
 
-        this.create();
-        this.previousTime = System.nanoTime();
+
+        gameloop = new Timer(1000 / 60, 
+        (event) -> 
+        {
+            //System.out.println("Hello");          
+            //turtle.moveBy(1, 0);
+            //turtle.rotateBy(1);
+            
+            // process input
+            input.update();
+
+            // update game state
+            update(1.0/60.0);
+
+            window.repaint(); // redraw sprites
+        });
+
+        initialize();
         gameloop.start();
+    }
+
+
+    // methods for interacting with groups
+    
+    /**
+     * Create a new group, and add it to the list of all groups.
+     *
+     * @param groupName the name of the group
+     * @return the group that was created
+     */
+    public Group createGroup(String groupName)
+    {
+        Group g = new Group(groupName);
+        groupList.add(g);
+        return g;
+    }
+    
+    /**
+     * Get the group with the given name from the list of all groups.
+     *
+     * @param groupName the name of the group
+     * @return the group with the given name
+     */
+    public Group getGroup(String groupName)
+    {
+        for (Group g : groupList)
+        {
+            if ( g.name.equals(groupName) )
+                return g;
+        }
+        
+        // if this line is reached, there is no group with that name
+        
+        // option 1: print message in Java console
+        // System.out.println("There is no group with the name: " + groupName);
+
+        // option 2: print message as an error (red font)
+        // System.err.println("There is no group with the name: " + groupName);
+
+        // option 3: print error and stop program (throw Exception)
+        throw new RuntimeException("There is no group with the name: " + groupName);
+    }
+    
+    /**
+     * Add a sprite to the group with the given name.
+     *
+     * @param sprite sprite to be added
+     * @param groupName name of the group to add the sprite to
+     */
+    public void addSpriteToGroup(Sprite sprite, String groupName)
+    {
+        // Group g = getGroup( groupName );
+        // g.addSprite( sprite );
+        
+        // or, more efficiently:
+        getGroup( groupName ).addSprite( sprite );
+    }
+    
+    /**
+     * Remove a sprite from the group with the given name
+     *
+     * @param sprite the sprite to be removed
+     * @param groupName name of the group that the sprite is in
+     */
+    public void removeSpriteFromGroup(Sprite sprite, String groupName)
+    {
+        getGroup( groupName ).removeSprite( sprite );
+    }
+    
+    /**
+     * Get the list of sprites in the group with the given name;
+     *   useful in for-loops, when interacting with a specific type of sprite.
+     *
+     * @param groupName the name of the group
+     * @return the list of sprites in that group
+     */
+    public ArrayList<Sprite> getGroupSpriteList(String groupName)
+    {
+        return getGroup( groupName ).getSpriteList();
+    }
+    
+    /**
+     * Return the number of sprites in the group with the given name
+     *
+     * @param groupName the name of the group
+     * @return the number of sprites in the group's sprite list
+     */
+    public int getGroupSpriteCount(String groupName)
+    {
+        return getGroup( groupName ).getSpriteCount();
     }
 }

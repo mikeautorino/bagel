@@ -14,7 +14,7 @@ import java.util.Collections;
  *   that corresponds to an image of the game world environment
  *   and data that corresponds to placement of game world entities.
  *   TileMaps may be used as a background image or as a collection
- *   of solid obstacles (using the {@link #preventSpriteOverlap(Sprite)} method).
+ *   of solid obstacles (using the {@link #preventSpriteOverlap(FinalSprite)} method).
  */
 public class TileMap extends Entity
 {
@@ -271,7 +271,7 @@ public class TileMap extends Entity
 	 * @param sprite the sprite to check for overlap
 	 * @return true if sprite overlaps any Tile in this TileMap
 	 */
-	public boolean checkSpriteOverlap(Sprite sprite)
+	public boolean checkSpriteOverlap(FinalSprite sprite)
 	{
 		Rectangle spriteBoundary = sprite.getBoundary();
 		for (Tile tile : mapTileList)
@@ -289,7 +289,7 @@ public class TileMap extends Entity
 	 * edges that occur between two adjacent tiles are ignored.
 	 * @param sprite the sprite to prevent from overlapping with tiles
 	 */
-	public void preventSpriteOverlap(Sprite sprite)
+	public void preventSpriteOverlap(FinalSprite sprite)
 	{
 		Rectangle spriteBoundary = sprite.getBoundary();
 		for (Tile tile : mapTileList)

@@ -35,13 +35,13 @@ public class Test2
         window.setVisible(true);
 
         Texture turtleTex = Texture.load("Java/assets/starfish-collector/turtle.png");
-        BasicSprite turtle = new BasicSprite();
+        Sprite turtle = new Sprite();
         turtle.setPosition(100,50);
         turtle.setTexture(turtleTex);
         // window.add(turtle);
 
         Texture starfishTex = Texture.load("Java/assets/starfish-collector/starfish.png");
-        BasicSprite starfish = new BasicSprite();
+        Sprite starfish = new Sprite();
         starfish.setPosition(10,50);
         starfish.setTexture(starfishTex);
         //window.add(starfish); // not both are drawing....
@@ -63,7 +63,7 @@ public class Test2
         window.setVisible(true);
 
         Texture turtleTex = Texture.load("Java/assets/starfish-collector/turtle.png");
-        BasicSprite turtle = new BasicSprite();
+        Sprite turtle = new Sprite();
         turtle.setPosition(100,50);
         turtle.angle = 30;
         turtle.setTexture(turtleTex);
@@ -71,12 +71,12 @@ public class Test2
 
 
         Texture starfishTex = Texture.load("Java/assets/starfish-collector/starfish.png");
-        BasicSprite starfish = new BasicSprite();
+        Sprite starfish = new Sprite();
         starfish.setPosition(10,50);
         starfish.setTexture(starfishTex);
         //window.add(starfish); // not both are drawing....
 
-        ArrayList<BasicSprite> spriteList = new ArrayList<BasicSprite>();
+        ArrayList<Sprite> spriteList = new ArrayList<Sprite>();
         spriteList.add(turtle);
         spriteList.add(starfish);
 
@@ -85,7 +85,7 @@ public class Test2
             protected void paintComponent(Graphics g) 
             {
                 super.paintComponent(g);
-                for (BasicSprite bs : spriteList)
+                for (Sprite bs : spriteList)
                     bs.draw(g);
             }
         };

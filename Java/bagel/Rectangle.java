@@ -35,12 +35,12 @@ public class Rectangle
 	double height;
 
 	/**
-	 * x-coordinate of right edge of rectangle
+	 * x-coordinate of right edge of rectangle (calculated)
 	 */
 	double right;
 
 	/**
-	 * y-coordinate of bottom edge of rectangle
+	 * y-coordinate of bottom edge of rectangle (calculated)
 	 */
 	double bottom;
 
@@ -103,13 +103,13 @@ public class Rectangle
 	 * @param other rectangle to translate away from
 	 * @return minimum length vector required to translate by to avoid overlap
 	 */
-	Vector2 getMinTranslationVector(Rectangle other)
+	Vector getMinTranslationVector(Rectangle other)
 	{
-		Vector2[] differences = { 
-				new Vector2(other.right - this.left, 0), // how to displace this to the right
-				new Vector2(other.left - this.right, 0), // to the left
-				new Vector2(0, other.bottom - this.top), // to the top
-				new Vector2(0, other.top - this.bottom)  // to the bottom
+		Vector[] differences = { 
+				new Vector(other.right - this.left, 0), // how to displace this to the right
+				new Vector(other.left - this.right, 0), // to the left
+				new Vector(0, other.bottom - this.top), // to the top
+				new Vector(0, other.top - this.bottom)  // to the bottom
 		};
 
 		// sort method may be used since Vector2 implements Comparable interface

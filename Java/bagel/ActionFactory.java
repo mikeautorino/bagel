@@ -19,7 +19,7 @@ public class ActionFactory
     public static Action moveBy(double deltaX, double deltaY, double duration)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.moveBy( deltaX/duration * deltaTime, deltaY/duration * deltaTime );
                 return (totalTime >= duration);
@@ -37,7 +37,7 @@ public class ActionFactory
     public static Action rotateBy(double deltaAngle, double duration)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.rotateBy( deltaAngle/duration * deltaTime );
                 return (totalTime >= duration);
@@ -56,7 +56,7 @@ public class ActionFactory
     public static Action fadeOut(double fadeRate)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.opacity -= fadeRate * deltaTime;
                 if (target.opacity < 0)
@@ -75,7 +75,7 @@ public class ActionFactory
     public static Action fadeIn(double fadeRate)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.opacity += fadeRate * deltaTime;
                 if (target.opacity > 1)
@@ -100,7 +100,7 @@ public class ActionFactory
             int currentIndex = 0;
             
             @Override
-            public boolean apply(Sprite target, double dt)
+            public boolean apply(FinalSprite target, double dt)
             {
                 Action currentAction = actionList.get(currentIndex);
                 boolean finished = currentAction.apply(target, dt);
@@ -137,7 +137,7 @@ public class ActionFactory
             int finishedTimes = 0;
 
             @Override
-            public boolean apply(Sprite target, double dt)
+            public boolean apply(FinalSprite target, double dt)
             {
                 boolean finished = action.apply(target, dt);
                 if (finished)
@@ -161,7 +161,7 @@ public class ActionFactory
         return new Action()
         {
             @Override
-            public boolean apply(Sprite target, double dt)
+            public boolean apply(FinalSprite target, double dt)
             {
                 boolean finished = action.apply(target, dt);
                 if (finished)
@@ -181,7 +181,7 @@ public class ActionFactory
     public static Action delay(double duration)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 return (totalTime >= duration);
             }
@@ -196,7 +196,7 @@ public class ActionFactory
     public static Action remove()
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.remove();
                 return true;
@@ -213,7 +213,7 @@ public class ActionFactory
     public static Action isAnimationFinished()
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 return target.animation.isFinished();
             }
@@ -221,16 +221,16 @@ public class ActionFactory
     }
 
     /**
-     * Create an Action that automatically calls {@link Sprite#boundToScreen(double, double)}.
+     * Create an Action that automatically calls {@link FinalSprite#boundToScreen(double, double)}.
      * <br> This Action is never completed.
      * @param screenWidth width of screen
      * @param screenHeight height of screen
-     * @return Action that automatically calls {@link Sprite#boundToScreen(double, double)}.
+     * @return Action that automatically calls {@link FinalSprite#boundToScreen(double, double)}.
      */
     public static Action boundToScreen(double screenWidth, double screenHeight)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.boundToScreen(screenWidth, screenHeight);
                 return false;
@@ -239,16 +239,16 @@ public class ActionFactory
     }
 
     /**
-     * Create an Action that automatically calls {@link Sprite#wrapToScreen(double, double)}.
+     * Create an Action that automatically calls {@link FinalSprite#wrapToScreen(double, double)}.
      * <br>This Action is never completed.
      * @param screenWidth width of screen
      * @param screenHeight height of screen
-     * @return Action that automatically calls {@link Sprite#wrapToScreen(double, double)}.
+     * @return Action that automatically calls {@link FinalSprite#wrapToScreen(double, double)}.
      */
     public static Action wrapToScreen(double screenWidth, double screenHeight)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 target.wrapToScreen(screenWidth, screenHeight);
                 return false;
@@ -268,7 +268,7 @@ public class ActionFactory
     public static Action destroyOutsideScreen(double screenWidth, double screenHeight)
     {
         return new Action(
-            (Sprite target, double deltaTime, double totalTime) ->
+            (FinalSprite target, double deltaTime, double totalTime) ->
             {
                 if (!target.isOnScreen(screenWidth, screenHeight))
                 {

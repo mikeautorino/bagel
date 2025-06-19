@@ -1,7 +1,7 @@
 package bagel;
 
 /**
- * A framework for storing a method that is applied to a target {@link Sprite} over time. 
+ * A framework for storing a method that is applied to a target {@link FinalSprite} over time. 
  * Actions are typically created with the static methods in the 
  * ActionFactory class, added to the target Sprite, and will then be applied 
  * automatically. Custom Action objects may be created by using lambda 
@@ -31,7 +31,7 @@ public class Action
          * @param totalTime  the total time that has elapsed since the encapsulating Action has started
          * @return true if the function has completed, false otherwise
          */
-        boolean run(Sprite target, double deltaTime, double totalTime);
+        boolean run(FinalSprite target, double deltaTime, double totalTime);
     }
     
     /**
@@ -70,7 +70,7 @@ public class Action
      * @param deltaTime elapsed time (seconds) since previous iteration of game loop (typically approximately 1/60 second)
      * @return true if the function.run method has completed, false otherwise
      */
-    boolean apply(Sprite target, double deltaTime)
+    boolean apply(FinalSprite target, double deltaTime)
     {
         this.totalTime += deltaTime;
         return this.function.run(target, deltaTime, totalTime);
