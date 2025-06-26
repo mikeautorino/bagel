@@ -25,12 +25,12 @@ public class Sprite
 	public Rectangle boundary;
 
 	/**
-	 * width of sprite collision rectangle
+	 * width of boundary rectangle and rendered image
 	 */
 	public double width;
 	
 	/**
-	 * height of sprite collision rectangle
+	 * height of boundary rectangle and rendered image
 	 */
 	public double height;
 	
@@ -79,15 +79,25 @@ public class Sprite
 
 	/**
 	 * Set the texture to be displayed when rendering this sprite.
-	 * Also sets width and height of this sprite.
+	 * Also sets default width and height of this sprite.
 	 * @param tex texture to use for this sprite
 	 */
 	public void setTexture(Texture tex)
 	{
 		this.texture = tex;
-		// ?? set boundary instead ??
 		this.width   = tex.region.width;
 		this.height  = tex.region.height;
+	}
+
+	/**
+	 * Set size to use for both collision re and image drawing
+	 * @param width width of sprite
+	 * @param height height of sprite
+	 */
+	public void setSize(double width, double height)
+	{
+		this.width = width;
+		this.height = height;
 	}
 
 	// collision methods
@@ -111,7 +121,7 @@ public class Sprite
 	 */
 	public boolean isOverlapping(Sprite other)
 	{
-		return this.getBoundary().overlaps( other.getBoundary() );
+		return this.getBoundary().isOverlapping( other.getBoundary() );
 	}
 
 	/**
@@ -160,40 +170,21 @@ public class Sprite
 		this.moveAtAngle(distance, this.angle);
 	}
 
-	/**
-	 * Set size to use when for boundary and when drawing this sprite
-	 * @param width width of sprite
-	 * @param height height of sprite
-	 */
-	public void setSize(double width, double height)
-	{
-		this.width = width;
-		this.height = height;
-	}
-
 	public void draw(Graphics g) 
 	{
 		if (!this.visible)
 			return;
 
-		// basic version
-        // g.drawImage(this.texture.image, (int)this.position.x, (int)this.position.y, null);
+		Graphics2D g2d = (Graphics2D) g.create();
+		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-		Graphics2D g2 = (Graphics2D) g.create();
-
-		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        // g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-        double cx = this.position.x + 0 * this.width / 2;
-        double cy = this.position.y + 0 * this.height / 2;
-
-        g2.rotate(Math.toRadians(angle), cx, cy);
-        g2.drawImage(this.texture.image, 
-			(int)(this.position.x - this.width/2), 
-			(int)(this.position.y - this.height/2), 
-			null);
-        g2.dispose();
+        g2d.rotate(Math.toRadians(angle), position.x, position.y);
+		g2d.translate(-width/2, -height/2);
+		// determine scaling factors
+		double scaleX = width / texture.region.width;
+		double scaleY = height / texture.region.height;
+		g2d.scale(scaleX, scaleY);
+        g2d.drawImage(texture.image, (int)(position.x / scaleX), (int)(position.y / scaleY), null);
+        g2d.dispose();
     }
-	
-	
 }

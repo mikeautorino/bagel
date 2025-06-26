@@ -1,6 +1,5 @@
 package bagel;
 
-
 /**
  * A two-dimensional vector (x,y), particularly useful for 
  * representing velocity and acceleration (see {@link Physics}), 

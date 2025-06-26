@@ -1,6 +1,6 @@
 package bagel;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 
 /**
  * Manage a collection of Sprites.
@@ -19,13 +19,21 @@ public class Group
      */
     public Group(String groupName)
     {
-        spriteList = new ArrayList<Sprite>();
         name = groupName;
+        spriteList = new ArrayList<Sprite>();
     }
-    
+
+    /**
+     * Return the name of this group.
+     * @return the group name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
     /**
      * Add a sprite to this collection.
-     *
      * @param s sprite to be added
      */
     public void addSprite(Sprite s)
@@ -35,7 +43,6 @@ public class Group
     
     /**
      * Remove this sprite from the collection.
-     *
      * @param s sprite to be removed
      */
     public void removeSprite(Sprite s)
@@ -45,7 +52,6 @@ public class Group
     
     /**
      * Return the number of sprites in this collection.
-     *
      * @return the number of sprites
      */
     public int getSpriteCount()

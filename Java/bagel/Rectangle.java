@@ -87,7 +87,7 @@ public class Rectangle
 	 * @param other rectangle to check for overlap
 	 * @return true if this rectangle overlaps with other rectangle
 	 */
-	boolean overlaps(Rectangle other)
+	boolean isOverlapping(Rectangle other)
 	{
 		boolean noOverlap = (other.right <= this.left) 
 				|| (this.right <= other.left) 

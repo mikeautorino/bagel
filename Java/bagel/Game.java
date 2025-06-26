@@ -1,10 +1,10 @@
 package bagel;
 
 import java.util.ArrayList;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
 /**
  *  Main class to be extended for game projects.
@@ -44,9 +44,12 @@ public abstract class Game
 	 */
 	public double elapsedTime; 
 
+    // FPS analyze data
+    public int countFPS;
+    public double timerFPS;
+
     public JFrame window;
     public JPanel canvas;
-    public Timer gameloop;
 
     public Input input;
 
@@ -64,10 +67,9 @@ public abstract class Game
 	 */
 	public abstract void update(double dt);
 
-    public void setWindowSize(int width, int height)
+    public Game()
     {
-        windowWidth = width;
-        windowHeight = height;
+
     }
 
     public void setWindowTitle(String title)
@@ -75,9 +77,10 @@ public abstract class Game
         windowTitle = title;
     }
 
-    public Game()
+    public void setWindowSize(int width, int height)
     {
-
+        windowWidth = width;
+        windowHeight = height;
     }
 
     public void run()
@@ -86,7 +89,10 @@ public abstract class Game
         window = new JFrame();
         window.setTitle(windowTitle);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setSize(windowWidth, windowHeight);
+        // set the size of the content area
+        window.getContentPane().setPreferredSize(
+            new Dimension(windowWidth, windowHeight) );
+        window.pack();
         window.setVisible(true);
 
         groupList = new ArrayList<Group>();
@@ -102,14 +108,14 @@ public abstract class Game
                 {
                     // update all sprites within the group
                     // g.update( 1.0 / 60.0 );
-                    for ( Sprite s : group.getSpriteList() )
+                    for ( Sprite sprite : group.getSpriteList() )
                     {
                         // if destroy function was called,
                         //  remove sprite from the group that contains it.
                         // if (s.destroySignal == true)
                         //     g.removeSprite(s);
                             
-                        s.draw(g);
+                        sprite.draw(g);
                     }
                 }
             }
@@ -121,33 +127,63 @@ public abstract class Game
         // must call after adding components
         window.revalidate();
 
-
-        gameloop = new Timer(1000 / 60, 
-        (event) -> 
-        {
-            //System.out.println("Hello");          
-            //turtle.moveBy(1, 0);
-            //turtle.rotateBy(1);
-            
-            // process input
-            input.update();
-
-            // update game state
-            update(1.0/60.0);
-
-            window.repaint(); // redraw sprites
-        });
+        elapsedTime = 0;
+        previousTime = System.currentTimeMillis();
 
         initialize();
-        gameloop.start();
-    }
 
+        int targetFPS = 60;
+        int loopDuration = 1000 / targetFPS;
+
+        while (true) 
+        {
+            if (System.currentTimeMillis() - previousTime > loopDuration) 
+            {
+                window.repaint();
+
+                // calculate time passed
+                long currentTime = System.currentTimeMillis();
+                deltaTime = (currentTime - previousTime) / 1000.0;
+                previousTime = currentTime;
+                elapsedTime += deltaTime;
+
+                // FPS calculations
+                countFPS++;
+                timerFPS += deltaTime;
+
+                // FPS check
+                if (timerFPS >= 1.0)
+                {
+                    System.out.println("FPS : " + countFPS);
+                    countFPS = 0;
+                    timerFPS = 0;
+                }
+
+                // process input
+                input.update();
+
+                // update game state
+                update(deltaTime);
+            }
+            else
+            {
+                try 
+                { 
+                    Thread.sleep(1); 
+                }
+                catch (Exception ex)
+                { 
+                    ex.printStackTrace(); 
+                }
+            }
+        }
+
+    }
 
     // methods for interacting with groups
     
     /**
      * Create a new group, and add it to the list of all groups.
-     *
      * @param groupName the name of the group
      * @return the group that was created
      */
@@ -160,7 +196,6 @@ public abstract class Game
     
     /**
      * Get the group with the given name from the list of all groups.
-     *
      * @param groupName the name of the group
      * @return the group with the given name
      */
@@ -168,7 +203,7 @@ public abstract class Game
     {
         for (Group g : groupList)
         {
-            if ( g.name.equals(groupName) )
+            if ( g.getName().equals(groupName) )
                 return g;
         }
         
@@ -186,22 +221,16 @@ public abstract class Game
     
     /**
      * Add a sprite to the group with the given name.
-     *
      * @param sprite sprite to be added
      * @param groupName name of the group to add the sprite to
      */
     public void addSpriteToGroup(Sprite sprite, String groupName)
     {
-        // Group g = getGroup( groupName );
-        // g.addSprite( sprite );
-        
-        // or, more efficiently:
         getGroup( groupName ).addSprite( sprite );
     }
     
     /**
      * Remove a sprite from the group with the given name
-     *
      * @param sprite the sprite to be removed
      * @param groupName name of the group that the sprite is in
      */
@@ -213,7 +242,6 @@ public abstract class Game
     /**
      * Get the list of sprites in the group with the given name;
      *   useful in for-loops, when interacting with a specific type of sprite.
-     *
      * @param groupName the name of the group
      * @return the list of sprites in that group
      */
@@ -224,7 +252,6 @@ public abstract class Game
     
     /**
      * Return the number of sprites in the group with the given name
-     *
      * @param groupName the name of the group
      * @return the number of sprites in the group's sprite list
      */
