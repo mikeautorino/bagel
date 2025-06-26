@@ -1,7 +1,7 @@
 package bagel;
 
 /**
- * A framework for storing a method that is applied to a target {@link FinalSprite} over time. 
+ * A framework for storing a method that is applied to a target {@link Sprite} over time. 
  * Actions are typically created with the static methods in the 
  * ActionFactory class, added to the target Sprite, and will then be applied 
  * automatically. Custom Action objects may be created by using lambda 
