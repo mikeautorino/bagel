@@ -1,15 +1,22 @@
-package net.stemkoski.bagel;
+package bagel;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import java.io.File;
 
+//import javafx.scene.canvas.GraphicsContext;
+import java.awt.Font;
+import java.awt.Color;
+//import javafx.scene.text.TextAlignment;
+import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 /**
  * A structure to store and display text.
  * Most properties are public and should be set directly.
  */
-public class Label extends Entity
+public class Label
 {
 	/**
 	 * Name of the current font. Set in {@link #loadFontFromSystem(String, int)}
@@ -75,12 +82,13 @@ public class Label extends Entity
     
 	/**
 	 * Initialize label to default settings.
+     * Default font is "Arial" with "PLAIN" style and size 16.
 	 */
     public Label()
     {
         this.fontName = "Arial";
         this.fontSize = 16;
-        this.font = new Font( this.fontName, this.fontSize );
+        this.font = new Font( this.fontName, Font.PLAIN, this.fontSize );
         this.fontColor = Color.BLACK;
         this.text = " ";
         this.x = 0;
@@ -96,10 +104,11 @@ public class Label extends Entity
      * Configure this label to use a font already installed on this system.
      * @param fontName name of font (e.g. "Arial", "Times New Roman", "Courier New"); must be installed on system
      * @param fontSize size of font
+     * @param style style of font (e.g. Font.PLAIN, Font.BOLD, Font.ITALIC, Font.BOLD + Font.ITALIC)
      */
-    public void loadFontFromSystem(String fontName, int fontSize)
+    public void loadFontFromSystem(String fontName, int fontStyle, int fontSize)
     {
-        this.font = new Font( fontName, fontSize );
+        this.font = new Font( fontName, fontStyle, fontSize );
         this.fontName = fontName;
         this.fontSize = fontSize;
     }
@@ -107,14 +116,24 @@ public class Label extends Entity
     /**
      * Configure this label to use a font from a specified file.
      * @param fontFileName name of font file
-     * @param fontSize size of font
+     * @param fontFileStyle style of font 
+     * @param fontFileSize size of font
+     * 
      */
-    public void loadFontFromFile(String fontFileName, int fontSize)
+    public void loadFontFromFile(String fontFileName, int fontFileStyle, int fontFileSize)
     {
-    	// String fileName = new File(fontFileName).toURI().toURL().toString();
-        this.font = Font.loadFont( "file:" + fontFileName, fontSize );    
+        Font customFont = null;
+        try {
+            // Load the font from the specified file
+            customFont = Font.createFont(Font.TRUETYPE_FONT, new File(fontFileName));
+        } catch (Exception e) {
+            System.err.println("Error loading font from file: " + fontFileName);
+            e.printStackTrace();
+        }
+
+        this.font = new Font( customFont.getName(), fontFileStyle, fontFileSize );
         this.fontName = this.font.getName();
-        this.fontSize = fontSize;
+        this.fontSize = fontFileSize;
     }
     
     /**
@@ -133,31 +152,30 @@ public class Label extends Entity
     /**
      * Render this text to a canvas used specified parameters. 
      */
-    @Override
-    public void draw(GraphicsContext context)
+  
+    public void draw(Graphics g)
     {
         if ( !this.visible )
             return;
             
-        context.setFont( this.font );
-        context.setFill( this.fontColor );
+        g.setFont( this.font );
+        g.setColor( this.fontColor );
 
         if (this.alignment.equals("LEFT"))
-            context.setTextAlign(TextAlignment.LEFT);
-        else if (this.alignment.equals("CENTER"))
-            context.setTextAlign(TextAlignment.CENTER);
+g        else if (this.alignment.equals("CENTER"))
+            g.setTextAlign(TextAlignment.CENTER);
         else if (this.alignment.equals("RIGHT"))
-            context.setTextAlign(TextAlignment.RIGHT);
+            g.setTextAlign(TextAlignment.RIGHT);
 
-        context.setTransform(1,0, 0,1, 0,0);
-        context.setGlobalAlpha(1);
-        context.fillText( this.text, this.x, this.y );
+        g.setTransform(1,0, 0,1, 0,0);
+        g.setGlobalAlpha(1);
+        g.drawString( this.text, this.x, this.y );  // doesn't take doubles
         
         if (this.borderDraw)
         {
-            context.setStroke(this.borderColor);
-            context.setLineWidth(this.borderSize);
-            context.strokeText( this.text, this.x, this.y );
+            g.setStroke(this.borderColor);
+            g.setLineWidth(this.borderSize);
+            g.strokeText( this.text, this.x, this.y );
         }
     }
 
