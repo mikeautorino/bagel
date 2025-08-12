@@ -10,17 +10,17 @@ public class Physics
     /**
      * Position of object.
      */
-    public Vector2 positionVector;
+    public Vector positionVector;
     
     /**
      * Velocity (rate of change of position) of object.
      */
-    public Vector2 velocityVector;
+    public Vector velocityVector;
     
     /**
      * Acceleration (rate of chance of velocity) of object.
      */
-    public Vector2 accelerationVector; 
+    public Vector accelerationVector; 
     
     /**
      * Constant amount of acceleration, used by {@link #accelerateAtAngle(double)}.
@@ -47,9 +47,9 @@ public class Physics
      */
     public Physics(double accValue, double maxSpeed, double decValue)
     {
-        this.positionVector     = new Vector2();
-        this.velocityVector     = new Vector2();
-        this.accelerationVector = new Vector2();
+        this.positionVector     = new Vector();
+        this.velocityVector     = new Vector();
+        this.accelerationVector = new Vector();
         this.accelerationValue  = accValue;
         this.maximumSpeed       = maxSpeed;
         this.decelerationValue  = decValue;
@@ -115,7 +115,7 @@ public class Physics
      */
     public void accelerateAtAngle(double angleDegrees)
     {
-        Vector2 v = new Vector2();
+        Vector v = new Vector();
         v.setLength(this.accelerationValue);
         v.setAngle(angleDegrees);
         this.accelerationVector.addVector( v );
