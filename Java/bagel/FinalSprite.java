@@ -1,12 +1,14 @@
-package net.stemkoski.bagel;
+package bagel;
 
 import java.util.ArrayList;
-import javafx.scene.canvas.GraphicsContext;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+
 
 /**
  * Sprites represent game world entities: characters, environment, items, obstacles, etc.
  */
-public class FinalSprite extends Entity
+public class FinalSprite
 {
 	
 	// core properties
@@ -164,8 +166,7 @@ public class FinalSprite extends Entity
 	/**
      * Render this sprite to a canvas using specified parameters
      */
-	@Override
-	void draw(GraphicsContext context)
+	public void draw(Graphics2D context)
 	{
 		if ( !this.visible )
 			return;
@@ -177,14 +178,16 @@ public class FinalSprite extends Entity
 			scaleX *= -1;
 		if (this.flipped)
 			scaleY *= -1;
-		double cosA = Math.cos(A);
-		double sinA = Math.sin(A);
-		context.setTransform(scaleX*cosA, scaleX*sinA, -scaleY*sinA, scaleY*cosA, this.x, this.y);
-		context.setGlobalAlpha(this.opacity);
+		//double cosA = Math.cos(A);
+		//double sinA = Math.sin(A);
+		AffineTransform transformation = AffineTransform.getRotateInstance(A, this.x, this.y);
+		transformation.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
+		transformation.concatenate(AffineTransform.getTranslateInstance(this.x, this.y));
+		context.setTransform(transformation);
+		context.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, (float)this.opacity));
+		
 		// image, 4 source parameters, 4 destination parameters
-		context.drawImage(this.texture.image, 
-				this.texture.region.left, this.texture.region.top, this.texture.region.width, this.texture.region.height,
-				-this.width/2, -this.height/2, this.width, this.height);
+		context.drawImage(this.texture.image, transformation, null);
 	}
 
 	// collision methods
@@ -207,7 +210,7 @@ public class FinalSprite extends Entity
 	 */
 	public boolean isOverlapping(FinalSprite other)
 	{
-		return this.getBoundary().overlaps( other.getBoundary() );
+		return this.getBoundary().isOverlapping( other.getBoundary() );
 	}
 
 	/**
@@ -330,7 +333,7 @@ public class FinalSprite extends Entity
 	{
 		if ( this.isOverlapping(other) )
 		{
-			Vector2 mtv = this.getBoundary().getMinTranslationVector( other.getBoundary() );
+			Vector mtv = this.getBoundary().getMinTranslationVector( other.getBoundary() );
 
 			// prevent overlap
 			this.moveBy(mtv.x, mtv.y);
@@ -374,7 +377,7 @@ public class FinalSprite extends Entity
 	 *   and removed from the Sprite when they are finished.
 	 *  @param deltaTime amount of time that has passed since the last iteration of the game loop
 	 */
-	@Override
+
 	public void act(double deltaTime)
 	{
 		// update physics, position (based on velocity and acceleration)
@@ -392,7 +395,7 @@ public class FinalSprite extends Entity
 		}
 		
 		// update animation, current texture
-	    //   if it has been initialized for this sprite
+		//   if it has been initialized for this sprite
 		if ( this.animation != null )
 		{
 			this.animation.update(deltaTime);

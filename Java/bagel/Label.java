@@ -188,8 +188,7 @@ public class Label
                 g2.setColor(oldColor);
             }
         }
-            // g.setLineWidth(this.borderSize);
-            // g.strokeText( this.text, this.x, this.y );
-        }   
-    }
+          
+    }   
+}
 
