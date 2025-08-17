@@ -1,10 +1,10 @@
-package net.stemkoski.bagel;
+package bagel;
 
 /**
  * A small rectangular image used in a {@link TileMap}.
  *
  */
-public class Tile extends Entity
+public class Tile
 {
 	
 	/**
