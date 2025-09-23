@@ -1,4 +1,4 @@
-package net.stemkoski.bagel;
+package bagel;
 
 /**
  * Extension of the {@link Physics} class,

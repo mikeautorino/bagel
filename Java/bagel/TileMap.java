@@ -1,12 +1,14 @@
-package net.stemkoski.bagel;
+package bagel;
 
-import javafx.scene.canvas.GraphicsContext;
-
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
-import javafx.scene.image.Image;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.util.Collections;
 
 /**
@@ -16,7 +18,7 @@ import java.util.Collections;
  *   TileMaps may be used as a background image or as a collection
  *   of solid obstacles (using the {@link #preventSpriteOverlap(FinalSprite)} method).
  */
-public class TileMap extends Entity
+public class TileMap
 {
 	/**
 	 *  number of rows of tiles in this TileMap
@@ -90,15 +92,20 @@ public class TileMap extends Entity
 	public void loadTilesetImage(String imageFileName)
 	{
 		this.tileTextureList = new ArrayList<Texture>();
-		String fileName = new File(imageFileName).toURI().toString();
-		Image tileSetImage = new Image(fileName);
+		BufferedImage tileSetImage = null;
+		try {
+			tileSetImage = ImageIO.read(new File(imageFileName));
+		} catch (java.io.IOException e) {
+			e.printStackTrace();
+			return;
+		}
 		int tileImageRows  = (int)tileSetImage.getWidth()  / this.tileWidth;
 		int tileImageCols  = (int)tileSetImage.getHeight() / this.tileHeight;
 		for (int y = 0; y < tileImageRows; y++)
 		{
 			for (int x = 0; x < tileImageCols; x++)
 			{
-				Texture texture = new Texture();
+				Texture texture = new Texture(imageFileName);
 				texture.image = tileSetImage;
 				texture.region = new Rectangle(x*tileWidth, y*tileHeight, tileWidth, tileHeight);
 				this.tileTextureList.add( texture );
@@ -229,9 +236,9 @@ public class TileMap extends Entity
 	 * @param symbol text character to locate in map data
 	 * @return list of positions where <code>symbol</code> occurs in map data
 	 */
-	public ArrayList<Vector2> getSymbolPositionList(String symbol)
+	public ArrayList<Vector> getSymbolPositionList(String symbol)
 	{
-		ArrayList<Vector2> positionList = new ArrayList<Vector2>();
+		ArrayList<Vector> positionList = new ArrayList<Vector>();
 
 		for (int r = 0; r < this.mapRows; r++)
 		{
@@ -241,7 +248,7 @@ public class TileMap extends Entity
 				{
 					double x = (c + 0.5) * this.tileWidth;
 					double y = (r + 0.5) * this.tileHeight;
-					positionList.add( new Vector2(x,y) );
+					positionList.add( new Vector(x,y) );
 				}
 			}
 		}
@@ -249,34 +256,32 @@ public class TileMap extends Entity
 		return positionList;
 	}
 
-	@Override
-	public void draw(GraphicsContext context)
+	public void draw(Graphics context)
 	{
 		for (Tile tile : this.mapTileList )
 		{
-			context.setTransform(1,0, 0,1, tile.x, tile.y); 
-			context.setGlobalAlpha(1.0);
+			Graphics2D g2d = (Graphics2D) context;
+			g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setTransform(new AffineTransform(1, 0, 0, 1, tile.x, tile.y));
+			g2d.setComposite(java.awt.AlphaComposite.getInstance(java.awt.AlphaComposite.SRC_OVER, 1.0f));
 
 			Texture tex = this.tileTextureList.get(tile.tileTextureIndex);
-
-			// image, 4 source parameters, 4 destination parameters
-			context.drawImage(tex.image, 
-					tex.region.left, tex.region.top, tex.region.width, tex.region.height,
-					-this.tileWidth/2, -this.tileHeight/2, this.tileWidth, this.tileHeight);
+			g2d.drawImage(tex.image, (int)(tile.x - tile.width/2), (int)(tile.y - tile.height/2), null);
+			g2d.dispose();
 		}
 	}
 
 	/**
-	 * Check if a sprite overlaps any Tile in this TileMap.
+	 * Check if a sprite isOverlapping any Tile in this TileMap.
 	 * @param sprite the sprite to check for overlap
-	 * @return true if sprite overlaps any Tile in this TileMap
+	 * @return true if sprite isOverlapping any Tile in this TileMap
 	 */
 	public boolean checkSpriteOverlap(FinalSprite sprite)
 	{
 		Rectangle spriteBoundary = sprite.getBoundary();
 		for (Tile tile : mapTileList)
 		{
-			if ( spriteBoundary.overlaps( tile.boundary ) )
+			if ( spriteBoundary.isOverlapping( tile.boundary ) )
 				return true;
 		}
 		return false;
@@ -294,26 +299,26 @@ public class TileMap extends Entity
 		Rectangle spriteBoundary = sprite.getBoundary();
 		for (Tile tile : mapTileList)
 		{
-			if ( spriteBoundary.overlaps( tile.boundary ) )
+			if ( spriteBoundary.isOverlapping( tile.boundary ) )
 			{
-				ArrayList<Vector2> differences = new ArrayList<Vector2>();
+				ArrayList<Vector> differences = new ArrayList<Vector>();
 
-				if ( tile.edgeLeft != null && spriteBoundary.overlaps(tile.edgeLeft) )
-					differences.add( new Vector2(tile.boundary.left - spriteBoundary.right, 0) ); // to the left
-				if ( tile.edgeRight != null && spriteBoundary.overlaps(tile.edgeRight) )
-					differences.add( new Vector2(tile.boundary.right - spriteBoundary.left, 0) ); // how to displace this sprite to the right
-				if ( tile.edgeTop != null && spriteBoundary.overlaps(tile.edgeTop) )
-					differences.add( new Vector2(0, tile.boundary.top - spriteBoundary.bottom) ); // to the bottom
-				if ( tile.edgeBottom != null && spriteBoundary.overlaps(tile.edgeBottom) )
-					differences.add( new Vector2(0, tile.boundary.bottom - spriteBoundary.top) ); // to the top
+				if ( tile.edgeLeft != null && spriteBoundary.isOverlapping(tile.edgeLeft) )
+					differences.add( new Vector(tile.boundary.left - spriteBoundary.right, 0) ); // to the left
+				if ( tile.edgeRight != null && spriteBoundary.isOverlapping(tile.edgeRight) )
+					differences.add( new Vector(tile.boundary.right - spriteBoundary.left, 0) ); // how to displace this sprite to the right
+				if ( tile.edgeTop != null && spriteBoundary.isOverlapping(tile.edgeTop) )
+					differences.add( new Vector(0, tile.boundary.top - spriteBoundary.bottom) ); // to the bottom
+				if ( tile.edgeBottom != null && spriteBoundary.isOverlapping(tile.edgeBottom) )
+					differences.add( new Vector(0, tile.boundary.bottom - spriteBoundary.top) ); // to the top
 
 				if ( differences.size() > 0 )
 				{
-					// sortable since Vector2 implements Comparable interface
+					// sortable since Vector implements Comparable interface
 					Collections.sort(differences);
 
 					// get minimum (length) vector to translate by
-					Vector2 mtv = differences.get(0);
+					Vector mtv = differences.get(0);
 					sprite.moveBy(mtv.x, mtv.y);
 
 					// if sprite is using physics, come to a stop in appropriate direction

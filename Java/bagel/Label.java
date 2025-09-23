@@ -1,7 +1,9 @@
 package bagel;
 
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
 import java.io.File;
 
 //import javafx.scene.canvas.GraphicsContext;
@@ -9,9 +11,13 @@ import java.awt.Font;
 import java.awt.Color;
 //import javafx.scene.text.TextAlignment;
 import java.awt.Graphics;
+
+import java.awt.FontMetrics;
+
 import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+
 /**
  * A structure to store and display text.
  * Most properties are public and should be set directly.
@@ -161,22 +167,40 @@ public class Label
         g.setFont( this.font );
         g.setColor( this.fontColor );
 
-        if (this.alignment.equals("LEFT"))
-g        else if (this.alignment.equals("CENTER"))
-            g.setTextAlign(TextAlignment.CENTER);
-        else if (this.alignment.equals("RIGHT"))
-            g.setTextAlign(TextAlignment.RIGHT);
 
-        g.setTransform(1,0, 0,1, 0,0);
-        g.setGlobalAlpha(1);
-        g.drawString( this.text, this.x, this.y );  // doesn't take doubles
-        
+        int drawX = (int) this.x;
+        int drawY = (int) this.y;
+        FontMetrics metrics = g.getFontMetrics(this.font);
+        int textWidth = metrics.stringWidth(this.text);
+
+        if (this.alignment.equals("CENTER")) {
+            drawX -= textWidth / 2;
+        } else if (this.alignment.equals("RIGHT")) {
+            drawX -= textWidth;
+        }
+        // drawY is already the baseline
         if (this.borderDraw)
         {
-            g.setStroke(this.borderColor);
-            g.setLineWidth(this.borderSize);
-            g.strokeText( this.text, this.x, this.y );
-        }
-    }
+            if (g instanceof Graphics2D) {
+                Graphics2D g2 = (Graphics2D) g;
+                java.awt.Stroke oldStroke = g2.getStroke();
+                java.awt.Color oldColor = g2.getColor();
+                g2.setColor(this.borderColor);
+                g2.setStroke(new java.awt.BasicStroke(this.borderSize));
+                // Draw border by drawing text multiple times offset by 1 pixel in 8 directions
+                for (int dx = -this.borderSize; dx <= this.borderSize; dx++) {
+                    for (int dy = -this.borderSize; dy <= this.borderSize; dy++) {
+                        if (dx != 0 || dy != 0) {
+                            g2.drawString(this.text, drawX + dx, drawY + dy);
+                        }
+                    }
+                }
+                g2.setStroke(oldStroke);
+                g2.setColor(oldColor);
+            }
 
+        }
+          
+    }   
 }
+
