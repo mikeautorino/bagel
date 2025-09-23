@@ -1,4 +1,9 @@
 package bagel;
+
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 import java.io.File;
 
 //import javafx.scene.canvas.GraphicsContext;
@@ -6,8 +11,13 @@ import java.awt.Font;
 import java.awt.Color;
 //import javafx.scene.text.TextAlignment;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
+
 import java.awt.FontMetrics;
+
+import java.awt.GraphicsEnvironment;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+
 /**
  * A structure to store and display text.
  * Most properties are public and should be set directly.
@@ -157,6 +167,7 @@ public class Label
         g.setFont( this.font );
         g.setColor( this.fontColor );
 
+
         int drawX = (int) this.x;
         int drawY = (int) this.y;
         FontMetrics metrics = g.getFontMetrics(this.font);
@@ -187,6 +198,7 @@ public class Label
                 g2.setStroke(oldStroke);
                 g2.setColor(oldColor);
             }
+
         }
           
     }   
