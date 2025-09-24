@@ -1,8 +1,8 @@
 package bagel;
 
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+//import javax.swing.JFrame;
+//import javax.swing.JLabel;
 
 import java.io.File;
 
@@ -14,9 +14,9 @@ import java.awt.Graphics;
 
 import java.awt.FontMetrics;
 
-import java.awt.GraphicsEnvironment;
+//import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+//import java.awt.RenderingHints;
 
 /**
  * A structure to store and display text.
