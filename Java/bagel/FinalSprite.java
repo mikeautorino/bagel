@@ -119,6 +119,21 @@ public class FinalSprite
 	// basic methods
 
 	/**
+	 * Remove this sprite from the game.
+	 * (In practice, this means removing all references to it,
+	 *  so that it can be garbage collected.)
+	 */
+	public void remove()
+	{
+		this.visible = false;
+		this.texture = null;
+		this.physics = null;
+		this.animation = null;
+		this.actionList.clear();
+		this.actionList = null;
+	}
+
+	/**
 	 * Set the coordinates of the center of this sprite.
 	 * @param x x-coordinate of center of sprite
 	 * @param y y-coordinate of center of sprite

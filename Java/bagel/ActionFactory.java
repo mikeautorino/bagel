@@ -1,4 +1,4 @@
-package net.stemkoski.bagel;
+package bagel;
 
 import java.util.Arrays;
 import java.util.ArrayList;

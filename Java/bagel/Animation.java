@@ -1,9 +1,11 @@
-package net.stemkoski.bagel;
+package bagel;
 
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import javafx.scene.image.Image;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 /**
  * A sequence of {@link Texture}s displayed in rapid succession 
@@ -121,19 +123,30 @@ public class Animation
     {
         Animation anim = new Animation();
         String fileName = new File(imageFileName).toURI().toString();
-        Image image = new Image(fileName);
-        double frameWidth  = image.getWidth() / cols;
-        double frameHeight = image.getHeight() / rows;
-        for (int y = 0; y < rows; y++)
-        {
-            for (int x = 0; x < cols; x++)
+        try 
+		{
+            BufferedImage image = ImageIO.read(new File(imageFileName));
+			double frameWidth  = image.getWidth() / cols;
+            double frameHeight = image.getHeight() / rows;
+
+            for (int y = 0; y < rows; y++)
             {
-                Texture texture = new Texture();
-                texture.image = image;
-                texture.region = new Rectangle(x*frameWidth, y*frameHeight, frameWidth, frameHeight);
-                anim.textureList.add( texture );
+                for (int x = 0; x < cols; x++)
+                {
+                    Texture texture = new Texture(fileName);
+                    texture.image = image;
+                    texture.region = new Rectangle(x*frameWidth, y*frameHeight, frameWidth, frameHeight);
+                    anim.textureList.add( texture );
+                }
             }
+        } 
+		catch (IOException e) 
+		{
+			System.err.println("error reading file");
+            e.printStackTrace();
         }
+        
+      
         anim.frameDuration = frameDuration;
         anim.loop = loop;
         anim.totalDuration = anim.frameDuration * anim.textureList.size();
