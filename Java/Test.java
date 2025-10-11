@@ -1,11 +1,12 @@
 import bagel.Vector;
+import java.io.File;
 
 public class Test 
 {
     public static void main(String[] args)
     {
         System.out.println("Hello, BAGEL!");
-
+        System.out.println(new File(".").getAbsolutePath());
         System.out.println("testing Vector class");
         Vector v = new Vector(3, 4);
         System.out.println( v );
