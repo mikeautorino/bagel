@@ -15,7 +15,7 @@ public class Test2
         window.setLocationRelativeTo(null);
         window.setVisible(true);
 
-        ImageIcon ii = new ImageIcon("assets/starfish-collector/turtle.png");
+        // ImageIcon ii = new ImageIcon("assets/starfish-collector/turtle.png");
         // adding component
         // JButton button = new JButton("Button");
         // window.add(button);
@@ -34,13 +34,13 @@ public class Test2
         // window.setLocationRelativeTo(null);
         window.setVisible(true);
 
-        Texture turtleTex = Texture.load("Java/assets/starfish-collector/turtle.png");
+        Texture turtleTex = new Texture("Java/assets/starfish-collector/turtle.png");
         Sprite turtle = new Sprite();
         turtle.setPosition(100,50);
         turtle.setTexture(turtleTex);
         // window.add(turtle);
 
-        Texture starfishTex = Texture.load("Java/assets/starfish-collector/starfish.png");
+        Texture starfishTex = new Texture("Java/assets/starfish-collector/starfish.png");
         Sprite starfish = new Sprite();
         starfish.setPosition(10,50);
         starfish.setTexture(starfishTex);
@@ -62,7 +62,7 @@ public class Test2
         window.setSize(400, 400);
         window.setVisible(true);
 
-        Texture turtleTex = Texture.load("Java/assets/starfish-collector/turtle.png");
+        Texture turtleTex = new Texture("Java/assets/starfish-collector/turtle.png");
         Sprite turtle = new Sprite();
         turtle.setPosition(100,50);
         turtle.angle = 30;
@@ -70,7 +70,7 @@ public class Test2
         // window.add(turtle);
 
 
-        Texture starfishTex = Texture.load("Java/assets/starfish-collector/starfish.png");
+        Texture starfishTex = new Texture("Java/assets/starfish-collector/starfish.png");
         Sprite starfish = new Sprite();
         starfish.setPosition(10,50);
         starfish.setTexture(starfishTex);
