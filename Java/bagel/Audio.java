@@ -1,7 +1,6 @@
 package bagel;
 
-import kuusisto.tinysound.Sound;
-import kuusisto.tinysound.TinySound;
+import java.io.File;
 
 
 /**
@@ -18,19 +17,16 @@ import kuusisto.tinysound.TinySound;
  */
 public class Audio
 {
-	private Sound sound;
-	private boolean isLooping;
-	private double volume;
+	AudioClip sound;
+	Media music;
+	MediaPlayer musicPlayer;
 
 	/**
 	 *  Empty constructor for internal methods; 
 	 *  use {@link #loadMusic(String)} or {@link #loadSound(String)} to create an instance.
 	 */
 	Audio()
-    {
-		this.volume = 1.0;
-		this.isLooping = false;
-	}
+    {  }
     
 	/**
 	 * Create an audio object from a sound file.
@@ -40,7 +36,7 @@ public class Audio
 	public static Audio loadSound(String fileName)
     {
         Audio audio = new Audio();
-        audio.sound = TinySound.loadSound(fileName);
+        audio.sound = new AudioClip( new File(fileName).toURI().toString() );
         return audio;
     }
     
@@ -52,7 +48,8 @@ public class Audio
 	public static Audio loadMusic(String fileName)
     {
         Audio audio = new Audio();
-        audio.sound = TinySound.loadSound(fileName);
+        audio.music = new Media( new File(fileName).toURI().toString() );
+        audio.musicPlayer = new MediaPlayer( audio.music );
         return audio;
     }
     
@@ -62,9 +59,16 @@ public class Audio
 	 */
 	public void setLoop(boolean loop)
     {
-		this.isLooping = loop;
+		int repeatCount = 1;
+		
+		if (loop)
+			repeatCount = Integer.MAX_VALUE;
+		
         if (sound != null)
-            sound.setLooping(loop);
+            sound.setCycleCount(repeatCount);
+            
+        if (music != null)
+            musicPlayer.setCycleCount(repeatCount);
     }
     
 	/**
@@ -73,9 +77,11 @@ public class Audio
 	 */
 	public void setVolume(double volume)
     {
-		this.volume = Math.max(0.0, Math.min(1.0, volume));
         if (sound != null)
-            sound.setVolume(this.volume);
+            sound.setVolume(volume);
+            
+        if (music != null)
+            musicPlayer.setVolume(volume);
     }
     
 	/**
@@ -84,7 +90,10 @@ public class Audio
 	public void play()
     {
         if (sound != null)
-            sound.play(volume);
+            sound.play();
+            
+        if (music != null)
+            musicPlayer.play();
     }
 	
 	/**
@@ -94,5 +103,8 @@ public class Audio
     {
         if (sound != null)
             sound.stop();
+            
+        if (music != null)
+            musicPlayer.stop();
     }
 }
