@@ -9,6 +9,7 @@ public class Group
 {
     // only allow interaction with list via group methods
     private ArrayList<Sprite> spriteList;
+    private ArrayList<FinalSprite> finalSpriteList;
     
     // identify this group by a name
     public String name;
@@ -40,6 +41,15 @@ public class Group
     {
         spriteList.add( s );
     }
+
+        /**
+     * Add a sprite to this collection.
+     * @param s sprite to be added
+     */
+    public void addFinalSprite(FinalSprite s)
+    {
+        finalSpriteList.add( s );
+    }
     
     /**
      * Remove this sprite from the collection.
@@ -70,6 +80,19 @@ public class Group
     public ArrayList<Sprite> getSpriteList()
     {
         return new ArrayList<Sprite>(spriteList);
+    }
+
+        /**
+     * Return a copy of the underlying list, useful when iterating (for loop)
+     *   over a collection of sprites.
+     * Necessary to avoid "Concurrent Modification Exception" - can't modify (add/remove)
+     *   objects to a list while iterating over the elements in that list.
+     *
+     * @return the list of final sprites
+     */
+    public ArrayList<FinalSprite> getFinalSpriteList()
+    {
+        return new ArrayList<FinalSprite>(finalSpriteList);
     }
     
     /**

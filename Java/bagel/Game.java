@@ -228,6 +228,16 @@ public abstract class Game
     {
         getGroup( groupName ).addSprite( sprite );
     }
+
+    /**
+     * Add a sprite to the group with the given name.
+     * @param sprite sprite to be added
+     * @param groupName name of the group to add the sprite to
+     */
+    public void addFinalSpriteToGroup(FinalSprite sprite, String groupName)
+    {
+        getGroup( groupName ).addSprite( sprite );
+    }
     
     /**
      * Remove a sprite from the group with the given name
@@ -250,6 +260,17 @@ public abstract class Game
         return getGroup( groupName ).getSpriteList();
     }
     
+        /**
+     * Get the list of sprites in the group with the given name;
+     *   useful in for-loops, when interacting with a specific type of sprite.
+     * @param groupName the name of the group
+     * @return the list of sprites in that group
+     */
+    public ArrayList<FinalSprite> getGroupFinalSpriteList(String groupName)
+    {
+        return getGroup( groupName ).getFinalSpriteList();
+    }
+
     /**
      * Return the number of sprites in the group with the given name
      * @param groupName the name of the group

@@ -8,7 +8,7 @@ import java.awt.geom.AffineTransform;
 /**
  * Sprites represent game world entities: characters, environment, items, obstacles, etc.
  */
-public class FinalSprite
+public class FinalSprite extends Sprite
 {
 	
 	// core properties
