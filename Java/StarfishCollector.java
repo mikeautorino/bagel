@@ -23,14 +23,14 @@ public class StarfishCollector extends Game
         createGroup("starfish");
 
         // water background (must be added first)
-        Texture waterTex = new Texture("./assets/starfish-collector/water.png");
+        Texture waterTex = new Texture("./Java/assets/starfish-collector/water.png");
         Sprite water = new Sprite();
         water.setPosition(400, 300);
         water.setTexture(waterTex);
         addSpriteToGroup(water, "main");
 
         // turtle (player character)
-        Texture turtleTex = new Texture("./assets/starfish-collector/turtle.png");
+        Texture turtleTex = new Texture("./Java/assets/starfish-collector/turtle.png");
         turtle = new Sprite();
         turtle.setPosition(400, 300);
         turtle.setTexture(turtleTex);
@@ -39,7 +39,7 @@ public class StarfishCollector extends Game
         // starfish (collectible objects)
         int starfishCount = 20;
         // only need to load texture once; all sprites share it
-        Texture starfishTex = new Texture("./assets/starfish-collector/starfish.png");
+        Texture starfishTex = new Texture("./Java/assets/starfish-collector/starfish.png");
         for (int i = 0; i < starfishCount; i++)
         {
             Sprite starfish = new Sprite();
@@ -51,7 +51,7 @@ public class StarfishCollector extends Game
         }
 
         // win message to display when game is over (all starfish collected)
-        Texture winMessageTex = new Texture("./assets/starfish-collector/youwin.png");
+        Texture winMessageTex = new Texture("./Java/assets/starfish-collector/youwin.png");
         winMessage = new Sprite();
         winMessage.setPosition(400, 300);
         winMessage.setTexture(winMessageTex);
@@ -65,9 +65,10 @@ public class StarfishCollector extends Game
         double moveSpeed = 100;
         // calculate distance to move turtle
         double distance = moveSpeed * deltaTime;
+    
 
         // move turtle depending on which key is pressed
-        if ( input.isKeyPressing("Left") )
+        if ( input.isKeyPressing("Left") )  
             turtle.moveBy( -distance, 0 );
         if ( input.isKeyPressing("Right") )
             turtle.moveBy( distance, 0 );
@@ -75,7 +76,7 @@ public class StarfishCollector extends Game
             turtle.moveBy( 0, -distance );
         if ( input.isKeyPressing("Down") )
             turtle.moveBy( 0, distance );
-        if ( input.isKeyPressing("Space") )
+        if ( input.isKeyPressing("Space") ) 
             turtle.rotateBy(1);
 
         // remove starfish when turtle overlaps (collects) them

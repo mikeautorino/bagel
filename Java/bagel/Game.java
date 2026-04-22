@@ -121,11 +121,18 @@ public abstract class Game
             }
         };
 
-        input = new Input(window);
-
         window.add(canvas);
         // must call after adding components
         window.revalidate();
+
+        input = new Input(canvas);
+
+        // Set focus so keyboard events are received
+        window.setFocusable(true);
+        window.requestFocus();
+
+        canvas.setFocusable(true);
+        canvas.requestFocus();
 
         elapsedTime = 0;
         previousTime = System.currentTimeMillis();

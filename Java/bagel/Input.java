@@ -1,7 +1,7 @@
 package bagel;
 
 import java.util.ArrayList;
-import javax.swing.JFrame;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -23,13 +23,31 @@ public class Input
     //   to be processed later on during our game loop.
     public ArrayList<String> pressQueue;
     public ArrayList<String> releaseQueue;
+    private String getKeyName(int keyCode)
+    {
+        switch(keyCode)
+        {
+            case KeyEvent.VK_UP:
+                return "Up";
+            case KeyEvent.VK_DOWN:
+                return "Down";
+            case KeyEvent.VK_LEFT:
+                return "Left";
+            case KeyEvent.VK_RIGHT:
+                return "Right";
+            case KeyEvent.VK_SPACE:
+                return "Space";
+            default:
+                return KeyEvent.getKeyText(keyCode);
+        }
+    }
  
     /**
      * Input Constructor
      *
-     * @param window the window that will register keyboard events
+     * @param component the component that will register keyboard events (usually a JPanel)
      */
-    public Input(JFrame window)
+    public Input(Component component)
     {
         pressedList = new ArrayList<String>();
         pressingList = new ArrayList<String>();
@@ -38,13 +56,15 @@ public class Input
         pressQueue = new ArrayList<String>();
         releaseQueue = new ArrayList<String>();
         
-        window.addKeyListener(
+        component.addKeyListener(
             new KeyListener()
             {
+
                 public void keyPressed(KeyEvent e)
                 {
                     // gets the keyboard key code (number) and converts to a string (name)
                     String keyName = KeyEvent.getKeyText(e.getKeyCode());
+                    keyName = getKeyName(e.getKeyCode());
                     // add the name to queue to be processed during game loop at correct time
                     pressQueue.add( keyName );
 
@@ -55,6 +75,7 @@ public class Input
                 {
                     // gets the keyboard key code (number) and converts to a string (name)
                     String keyName = KeyEvent.getKeyText(e.getKeyCode());
+                    keyName = getKeyName(e.getKeyCode());
                     // add the name to queue to be processed during game loop at correct time
                     releaseQueue.add( keyName );
 
